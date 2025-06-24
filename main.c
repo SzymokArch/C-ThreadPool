@@ -18,6 +18,12 @@ void example_task(void* arg)
     atomic_fetch_add(data->completed_tasks, 1);
 }
 
+void example_task_nocleanup([[maybe_unused]] void* arg)
+{
+    printf("No parameter task is running in thread %ld\n", pthread_self());
+    sleep(1);
+}
+
 int main(void)
 {
     _Atomic int completed_tasks = 0;
@@ -47,6 +53,13 @@ int main(void)
         sched_yield();
     }
     printf("Tasks completed!\n");
+
+    for (int i = 0; i < 10; ++i) {
+        task_type t = { .task_func = example_task_nocleanup,
+                        .args = NULL,
+                        .cleanup_func = NO_CLEANUP };
+        thread_pool_submit(&pool, t);
+    }
 
     thread_pool_shutdown(&pool);
     printf("All tasks complete. Pool shut down.\n");
