@@ -1,6 +1,6 @@
-#include "task_queue.h"
-#include <stdlib.h>
+#include "../include/task_queue.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 bool tasks_pending(task_queue* q)
 {

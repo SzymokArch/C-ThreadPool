@@ -1,6 +1,6 @@
-#include "thread_pool.h"
-#include <stdlib.h>
+#include "../include/thread_pool.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void* worker_thread(void* arg)
 {

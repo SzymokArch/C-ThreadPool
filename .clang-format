@@ -1,0 +1,12 @@
+BasedOnStyle: Webkit
+IndentWidth: 4
+ColumnLimit: 80
+AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Stroustrup
+AccessModifierOffset: -2
+IndentCaseLabels: true
+IndentCaseBlocks: true
+SortIncludes: false
+AllowAllArgumentsOnNextLine: false
+BinPackArguments: false
+AlignAfterOpenBracket: BlockIndent

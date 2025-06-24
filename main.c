@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <stdatomic.h>
 #include <sched.h>
-#include "thread_pool.h"
+#include "include/thread_pool.h"
 
 typedef struct {
     int id;
