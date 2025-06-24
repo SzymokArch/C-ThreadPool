@@ -72,14 +72,14 @@ void cleanup_args_default(void* args)
 And then when creating the task you can for example do:
 ```c
 task_type t = { .task_func = example_task,
-				.args = args, // args pointer allocated earlier
-				.cleanup_func = cleanup_args_default };
+		.args = args, // args pointer allocated earlier
+		.cleanup_func = cleanup_args_default };
 ```
 If you don't want the task function to take any parameters, you can pass `NULL` into the `.args` field and the `NO_CLEANUP` constant inside the `.cleanup_func` field, like so:
 ```c
 task_type t = { .task_func = example_task_nocleanup,
-				.args = NULL,
-				.cleanup_func = NO_CLEANUP };
+		.args = NULL,
+		.cleanup_func = NO_CLEANUP };
 ```
 . If you want the cleanup function to do more complex stuff than freeing the space occupied by `args` or doing nothing, you can define your own function and pass it into the `.cleanup_func` field. 
 
