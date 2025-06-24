@@ -2,20 +2,31 @@
 A simple thread pool implementation in C. 
 Tested under `gcc 15.1.1` and `clang 20.1.6` with `-Wall -Wextra -Wpedantic` flags on GNU/Linux. The code doesn't emit any errors or warnings (*excluding `-Wc23-extensions` in the provided example `main.c`*).
 # Actually using the thread pool
-Clone the repo and place all the source files (*excluding the example `main.c` file*) inside the directory in which you want to use the thread pool.
-Inside your source files you'll want to write
-```c
-#include "thread_pool.h"
+## Build instructions
+First you need to clone the repository
+```bash
+git clone https://github.com/SzymokArch/C-ThreadPool
 ```
-Currently the build command I'm using is this:
-```bash 
-clang main.c task_queue.c thread_pool.c -lm -lpthread -Wall -Wextra -Wpedantic -o out 
+Then you need to build the library
+```bash
+cd C-ThreadPool && make
 ```
-and then to run the example
+Now you're ready to go!
+Include the header in your source code
+```C
+#include "path/to/C-ThreadPool/include/thread_pool.h"
+```
+Obviously replace the *"path/to"* with your path.
+
+When compiling your project you need to tell your compile where the include files using the `-I` flag and where the `libthreadpool.a` static library file is using the `-L` flag.
+If you want to compile the provided example `main.c` file this is the simplest command for it (*assuming you're in the `C-ThreadPool` directory*):
+```bash
+cc main.c -Iinclude -L. -lthreadpool -o out
+```
+And then execute it by running:
 ```bash
 ./out
 ```
-You can substitute the `main.c` with whatever you want. In the future I'll probably make some fancy Makefile to make compilation less of a hassle.
 ## Important stuff here!
 The core of this thread pool implementation is the `task_type` structure. The structure contains two function pointers and a void pointer pointing to the function's parameters. The definition of the parameters is left to the programmer. 
 ```c
