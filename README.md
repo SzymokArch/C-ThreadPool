@@ -64,7 +64,7 @@ void example_task_nocleanup([[maybe_unused]] void* arg)
 ```
 (*Note the* `[[maybe_unused]]` *attribute, without it the code will emit a warning that the* `arg` *variable is not used, which is obviously true, since the pointer is* `NULL` *and there's no point in using this variable, but the function **has to** have a void pointer as its parameter so that the function is compatible with the task function pointer. When creating tasks without parameters feel free to ignore this warning if you absolutely can't use C23 extensions*)
 
-After the task function is completed the cleanup function will be called. Most of the time the function will only be needed to free the `args` pointer, there is no need to define this manually since there is a function that does just that
+After the task function is completed the cleanup function will be called. Most of the time the function will only be needed to free the `args` pointer, there is no need to define this manually since there I already provided a function that does just that
 ```c
 void cleanup_args_default(void* args)
 ```
