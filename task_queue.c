@@ -11,7 +11,7 @@ bool tasks_pending(task_queue* q)
     return q->front_ptr != NULL;
 }
 
-task_queue init_task_queue()
+task_queue init_task_queue(void)
 {
     task_queue q = { .front_ptr = NULL,
                      .back_ptr = NULL,

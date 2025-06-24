@@ -18,7 +18,7 @@ void example_task(void* arg)
     atomic_fetch_add(data->completed_tasks, 1);
 }
 
-int main()
+int main(void)
 {
     _Atomic int completed_tasks = 0;
 
