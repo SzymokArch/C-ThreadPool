@@ -37,14 +37,13 @@ typedef struct {
 ```
 And then allocating the space for `args` before submitting the task to the queue, for example:
 ```c
-_Atomic int completed_tasks = 0;
 task_args* args = malloc(sizeof(task_args));
 if (!args) {
 	fprintf(stderr, "Allocation failure\n");
 	exit(EXIT_FAILURE);
 }
-args->id = i;
-args->completed_tasks = &completed_tasks;
+args->id = i; // loop index
+args->completed_tasks = &completed_tasks; // pointer to _Atomic int that was declared in the beginning of main.c
 ```
 Example task functions:
 ```c
