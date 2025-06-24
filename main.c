@@ -1,3 +1,5 @@
+// cc main.c -Iinclude -L. -lthreadpool -o out
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
