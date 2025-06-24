@@ -48,29 +48,38 @@ void enqueue_task(task_queue* q, task_type t)
 
 task_type dequeue_task(task_queue* q)
 {
-    if (q == NULL || q->front_ptr == NULL) {
-        fprintf(stderr, "Can't dequeue from an empty or invalid queue\n");
+    if (q == NULL) {
+        fprintf(stderr, "Invalid queue\n");
         exit(EXIT_FAILURE);
     }
-    pthread_mutex_lock(&q->mutex);
 
-    task_type result_task = q->front_ptr->task;
-    task_node* temp = q->front_ptr->next_ptr;
-    free(q->front_ptr);
-    q->front_ptr = temp;
-    if (q->front_ptr == NULL) {
-        q->back_ptr = NULL;
+    pthread_mutex_lock(&q->mutex);
+    while (!q->front_ptr && !q->shutdown) {
+        pthread_cond_wait(&q->cond, &q->mutex);
     }
 
+    if (q->shutdown && !q->front_ptr) {
+        pthread_mutex_unlock(&q->mutex);
+        task_type empty = { 0 }; // return empty task
+        return empty;
+    }
+
+    task_node* node = q->front_ptr;
+    task_type t = node->task;
+    q->front_ptr = node->next_ptr;
+    if (!q->front_ptr) {
+        q->back_ptr = NULL;
+    }
+    free(node);
+
     pthread_mutex_unlock(&q->mutex);
-    return result_task;
+    return t;
 }
 
 void run_task(task_type t)
 {
     if (t.task_func == NULL) {
-        fprintf(stderr, "Invalid task\n");
-        exit(EXIT_FAILURE);
+        return; // gracefully ignore empty/shutdown task
     }
     t.task_func(t.args);
     if (t.cleanup_func) {

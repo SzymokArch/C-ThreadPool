@@ -26,6 +26,7 @@ void example_task_nocleanup([[maybe_unused]] void* arg)
 
 int main(void)
 {
+    int task_count = 64;
     _Atomic int completed_tasks = 0;
 
     long system_threads = sysconf(_SC_NPROCESSORS_ONLN);
@@ -34,7 +35,7 @@ int main(void)
     thread_pool pool;
     thread_pool_init(&pool, system_threads);
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < task_count; ++i) {
         task_args* args = malloc(sizeof(task_args));
         if (!args) {
             fprintf(stderr, "Allocation failure\n");
@@ -49,12 +50,12 @@ int main(void)
 
         thread_pool_submit(&pool, t);
     }
-    while (atomic_load(&completed_tasks) != 10) {
+    while (atomic_load(&completed_tasks) != task_count) {
         sched_yield();
     }
     printf("Tasks completed!\n");
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < task_count; ++i) {
         task_type t = { .task_func = example_task_nocleanup,
                         .args = NULL,
                         .cleanup_func = NO_CLEANUP };

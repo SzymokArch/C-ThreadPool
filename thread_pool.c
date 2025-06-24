@@ -4,42 +4,13 @@
 
 void* worker_thread(void* arg)
 {
-    if (arg == NULL) {
-        fprintf(stderr, "Wrong task queue pointer\n");
-        exit(EXIT_FAILURE);
-    }
     task_queue* q = (task_queue*)arg;
     while (true) {
-        pthread_mutex_lock(&q->mutex);
-
-        while (!q->front_ptr && !q->shutdown) {
-            // Wait for a task or shutdown signal
-            pthread_cond_wait(&q->cond, &q->mutex);
+        task_type t = dequeue_task(q);
+        if (t.task_func == NULL && q->shutdown) {
+            break;
         }
-
-        if (q->shutdown && !q->front_ptr) {
-            pthread_mutex_unlock(&q->mutex);
-            break; // exit thread loop
-        }
-
-        // dequeue task safely
-        task_node* node = q->front_ptr;
-        task_type t = node->task;
-        q->front_ptr = node->next_ptr;
-        if (q->front_ptr == NULL) {
-            q->back_ptr = NULL;
-        }
-        free(node);
-
-        pthread_mutex_unlock(&q->mutex);
-
-        // run task outside lock
-        if (t.task_func) {
-            t.task_func(t.args);
-        }
-        if (t.cleanup_func) {
-            t.cleanup_func(t.args);
-        }
+        run_task(t);
     }
     return NULL;
 }
