@@ -34,10 +34,12 @@ void* worker_thread(void* arg)
         pthread_mutex_unlock(&q->mutex);
 
         // run task outside lock
-        if (t.task_func)
+        if (t.task_func) {
             t.task_func(t.args);
-        if (t.cleanup_func)
+        }
+        if (t.cleanup_func) {
             t.cleanup_func(t.args);
+        }
     }
     return NULL;
 }

@@ -4,7 +4,7 @@
 
 bool tasks_pending(task_queue* q)
 {
-    if (!q) {
+    if (q == NULL) {
         fprintf(stderr, "Invalid queue address\n");
         exit(EXIT_FAILURE);
     }
@@ -23,13 +23,13 @@ task_queue init_task_queue(void)
 
 void enqueue_task(task_queue* q, task_type t)
 {
-    if (!q) {
+    if (q == NULL) {
         fprintf(stderr, "Invalid queue\n");
         exit(EXIT_FAILURE);
     }
     task_node* new_node = calloc(1, sizeof(task_node));
-    if (!new_node) {
-        fprintf(stderr, "Allocation failed\n");
+    if (new_node == NULL) {
+        fprintf(stderr, "Allocation failure\n");
         exit(EXIT_FAILURE);
     }
     new_node->task = t;
@@ -48,10 +48,12 @@ void enqueue_task(task_queue* q, task_type t)
 
 task_type dequeue_task(task_queue* q)
 {
-    if (!q || q->front_ptr == NULL) {
+    if (q == NULL || q->front_ptr == NULL) {
         fprintf(stderr, "Can't dequeue from an empty or invalid queue\n");
         exit(EXIT_FAILURE);
     }
+    pthread_mutex_lock(&q->mutex);
+
     task_type result_task = q->front_ptr->task;
     task_node* temp = q->front_ptr->next_ptr;
     free(q->front_ptr);
@@ -59,12 +61,14 @@ task_type dequeue_task(task_queue* q)
     if (q->front_ptr == NULL) {
         q->back_ptr = NULL;
     }
+
+    pthread_mutex_unlock(&q->mutex);
     return result_task;
 }
 
 void run_task(task_type t)
 {
-    if (!t.task_func) {
+    if (t.task_func == NULL) {
         fprintf(stderr, "Invalid task\n");
         exit(EXIT_FAILURE);
     }
@@ -76,14 +80,17 @@ void run_task(task_type t)
 
 void free_task_queue(task_queue* q)
 {
-    if (!q)
-        return;
+    if (q == NULL) {
+        fprintf(stderr, "Wrong task queue pointer\n");
+        exit(EXIT_FAILURE);
+    }
     pthread_mutex_lock(&q->mutex);
     task_node* current = q->front_ptr;
     while (current) {
         task_node* next = current->next_ptr;
-        if (current->task.cleanup_func)
+        if (current->task.cleanup_func) {
             current->task.cleanup_func(current->task.args);
+        }
         free(current);
         current = next;
     }
