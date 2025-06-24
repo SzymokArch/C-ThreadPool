@@ -86,7 +86,7 @@ void thread_pool_shutdown(thread_pool* pool)
 
 void cleanup_args_default(void* args)
 {
-    if (!args) {
+    if (args != NULL) {
         free(args);
     }
 }
