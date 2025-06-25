@@ -22,11 +22,15 @@ void thread_pool_init(thread_pool* pool, size_t num_threads)
         exit(EXIT_FAILURE);
     }
     pool->thread_count = num_threads;
-    pool->threads = malloc(num_threads * sizeof(pthread_t));
-    pool->queue = init_task_queue();
+    pool->threads = calloc(num_threads, sizeof(pthread_t));
+    if (pool->threads == NULL) {
+        fprintf(stderr, "Allocation failure!\n");
+        exit(EXIT_FAILURE);
+    }
+    init_task_queue(&(pool->queue));
 
     for (size_t i = 0; i < num_threads; ++i) {
-        pthread_create(&pool->threads[i], NULL, worker_thread, &pool->queue);
+        pthread_create(&(pool->threads[i]), NULL, worker_thread, &pool->queue);
     }
 }
 

@@ -27,7 +27,7 @@ struct task_queue {
 };
 
 bool tasks_pending(task_queue* q);
-task_queue init_task_queue(void);
+void init_task_queue(task_queue* q);
 void enqueue_task(task_queue* q, task_type t);
 task_type dequeue_task(task_queue* q);
 void run_task(task_type t);
