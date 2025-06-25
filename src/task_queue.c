@@ -1,4 +1,5 @@
 #include "../include/task_queue.h"
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,14 +12,20 @@ bool tasks_pending(task_queue* q)
     return q->front_ptr != NULL;
 }
 
-task_queue init_task_queue(void)
+void init_task_queue(task_queue* q)
 {
-    task_queue q = { .front_ptr = NULL,
-                     .back_ptr = NULL,
-                     .mutex = PTHREAD_MUTEX_INITIALIZER,
-                     .cond = PTHREAD_COND_INITIALIZER,
-                     .shutdown = false };
-    return q;
+    q->front_ptr = NULL;
+    q->back_ptr = NULL;
+    int mutex_init_retval = pthread_mutex_init(&(q->mutex), NULL);
+    if (mutex_init_retval != 0) {
+        fprintf(stderr, "Mutex initialization failure!\n");
+        exit(EXIT_FAILURE);
+    }
+    int cond_init_retval = pthread_cond_init(&(q->cond), NULL);
+    if (cond_init_retval != 0) {
+        fprintf(stderr, "Cond initialization failure!\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void enqueue_task(task_queue* q, task_type t)
