@@ -10,9 +10,9 @@ typedef struct thread_pool {
     task_queue queue;
 } thread_pool;
 
-void thread_pool_init(thread_pool* pool, size_t num_threads);
-void thread_pool_submit(thread_pool* pool, task_type task);
-void thread_pool_shutdown(thread_pool* pool);
+int thread_pool_init(thread_pool* pool, size_t num_threads);
+int thread_pool_submit(thread_pool* pool, task_type task);
+int thread_pool_shutdown(thread_pool* pool);
 
 void cleanup_args_default(void* args);
 

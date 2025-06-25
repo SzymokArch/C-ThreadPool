@@ -35,11 +35,14 @@ int main(void)
     printf("Available threads: %ld\n", system_threads);
 
     thread_pool pool;
-    thread_pool_init(&pool, system_threads);
+    if (thread_pool_init(&pool, system_threads) != 0) {
+        fprintf(stderr, "Thread pool init failure!\n");
+        exit(EXIT_FAILURE);
+    }
 
     for (int i = 0; i < task_count; ++i) {
         task_args* args = malloc(sizeof(task_args));
-        if (!args) {
+        if (args == NULL) {
             fprintf(stderr, "Allocation failure\n");
             exit(EXIT_FAILURE);
         }
@@ -50,7 +53,10 @@ int main(void)
                         .args = args,
                         .cleanup_func = cleanup_args_default };
 
-        thread_pool_submit(&pool, t);
+        if (thread_pool_submit(&pool, t) != 0) {
+            fprintf(stderr, "Task submition failure!\n");
+            exit(EXIT_FAILURE);
+        }
     }
     while (atomic_load(&completed_tasks) != task_count) {
         sched_yield();
@@ -61,10 +67,16 @@ int main(void)
         task_type t = { .task_func = example_task_nocleanup,
                         .args = NULL,
                         .cleanup_func = NO_CLEANUP };
-        thread_pool_submit(&pool, t);
+        if (thread_pool_submit(&pool, t) != 0) {
+            fprintf(stderr, "Task submition failure!\n");
+            exit(EXIT_FAILURE);
+        }
     }
 
-    thread_pool_shutdown(&pool);
+    if (thread_pool_shutdown(&pool) != 0) {
+        fprintf(stderr, "Thread pool couldn't be closed!\n");
+        exit(EXIT_FAILURE);
+    }
     printf("All tasks complete. Pool shut down.\n");
 
     return 0;

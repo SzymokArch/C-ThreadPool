@@ -1,6 +1,7 @@
 #include "../include/thread_pool.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <asm-generic/errno-base.h>
 
 void* worker_thread(void* arg)
 {
@@ -15,39 +16,40 @@ void* worker_thread(void* arg)
     return NULL;
 }
 
-void thread_pool_init(thread_pool* pool, size_t num_threads)
+int thread_pool_init(thread_pool* pool, size_t num_threads)
 {
     if (pool == NULL) {
-        fprintf(stderr, "Wrong thread pool pointer\n");
-        exit(EXIT_FAILURE);
+        return EFAULT;
     }
     pool->thread_count = num_threads;
     pool->threads = calloc(num_threads, sizeof(pthread_t));
     if (pool->threads == NULL) {
-        fprintf(stderr, "Allocation failure!\n");
-        exit(EXIT_FAILURE);
+        return ENOMEM;
     }
-    init_task_queue(&(pool->queue));
+    int init_task_queue_retval = init_task_queue(&(pool->queue));
+    if (init_task_queue_retval != 0) {
+        return init_task_queue_retval;
+    }
 
     for (size_t i = 0; i < num_threads; ++i) {
         pthread_create(&(pool->threads[i]), NULL, worker_thread, &pool->queue);
     }
+    return 0;
 }
 
-void thread_pool_submit(thread_pool* pool, task_type task)
+int thread_pool_submit(thread_pool* pool, task_type task)
 {
     if (pool == NULL) {
-        fprintf(stderr, "Wrong thread pool pointer\n");
-        exit(EXIT_FAILURE);
+        return EFAULT;
     }
     enqueue_task(&pool->queue, task);
+    return 0;
 }
 
-void thread_pool_shutdown(thread_pool* pool)
+int thread_pool_shutdown(thread_pool* pool)
 {
     if (pool == NULL) {
-        fprintf(stderr, "Wrong thread pool pointer\n");
-        exit(EXIT_FAILURE);
+        return EFAULT;
     }
     pthread_mutex_lock(&pool->queue.mutex);
     pool->queue.shutdown = true;
@@ -59,6 +61,7 @@ void thread_pool_shutdown(thread_pool* pool)
     }
     free(pool->threads);
     free_task_queue(&pool->queue);
+    return 0;
 }
 
 void cleanup_args_default(void* args)

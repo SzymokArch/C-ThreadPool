@@ -27,10 +27,10 @@ struct task_queue {
 };
 
 bool tasks_pending(task_queue* q);
-void init_task_queue(task_queue* q);
-void enqueue_task(task_queue* q, task_type t);
+int init_task_queue(task_queue* q);
+int enqueue_task(task_queue* q, task_type t);
 task_type dequeue_task(task_queue* q);
-void run_task(task_type t);
-void free_task_queue(task_queue* q);
+int run_task(task_type t);
+int free_task_queue(task_queue* q);
 
 #endif // TASK_QUEUE_H
